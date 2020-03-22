@@ -1,0 +1,42 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: api-alb
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+#    alb.ingress.kubernetes.io/healthcheck-path: '/health'
+  labels:
+    app: msa-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api/users*
+        backend:
+          serviceName: usersport
+          servicePort: 8080
+  - http:
+      paths:
+      - path: /api/threads*
+        backend:
+          serviceName: threadsport
+          servicePort: 8080
+  - http:
+      paths:
+      - path: /api/posts*
+        backend:
+          serviceName: postsport
+          servicePort: 8080
+  - http:
+      paths:
+      - path: /api
+        backend:
+          serviceName: apisport
+          servicePort: 8080
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: websport
+          servicePort: 3000
