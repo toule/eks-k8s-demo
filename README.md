@@ -9,12 +9,9 @@
 ## 가정사항
 
 * Amazon Web Service(AWS)에 계정이 있음
-
 * 기본적인 쿠버네티스 API Object를 이해함
-
 * 환경: Cloud9 (AWS IDE)
-
-
+* Cloud9은 public에 구성하며 Security Group의 TCP 3000 port는 Any로 열어줌
 
 
 
