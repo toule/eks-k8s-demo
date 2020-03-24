@@ -8,10 +8,13 @@
 
 ## 가정사항
 
+* 다음 [예제](https://github.com/toule/gke-k8s-demo)와 방식은 동일함
 * Amazon Web Service(AWS)에 계정이 있음
 * 기본적인 쿠버네티스 API Object를 이해함
 * 환경: Cloud9 (AWS IDE)
-* Cloud9은 public에 구성하며 Security Group의 TCP 3000 port는 Any로 열어줌
+* Kubernetes version: 1.14
+* Cloud9은 ec2기반으로 public에 구성하며 Security Group의 TCP 3000 port는 Any로 열어줌
+* ECR에 접근하기 위해 IAM role을 설정하거나 자격증명은 미리 준비함
 
 
 
@@ -22,6 +25,46 @@
 > https://github.com/toule/aws_cdk_basic_sample
 
 
+
+
+
+## Kubectl install
+
+- 다음 [문서](https://eksworkshop.com/020_prerequisites/k8stools/)를 참조 (엔진 버전과 클라이언트 버전이 일치하는 것을 권장함)
+
+- Download
+
+  ```bash
+  sudo curl --silent --location -o /usr/local/bin/kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.14.6/2019-08-22/bin/linux/amd64/kubectl
+  ```
+
+- Permission
+
+  ```bash
+  sudo chmod +x /usr/local/bin/kubectl
+  ```
+
+- Install jq, envsubset and bash-completion
+
+  ```bash
+  sudo yum -y install jq gettext bash-completion
+  ```
+
+- Enable kubectl bash_completion
+
+  ```bash
+  kubectl completion bash >>  ~/.bash_completion
+  . /etc/profile.d/bash_completion.sh
+  . ~/.bash_completion
+  ```
+
+- Version 확인
+
+  ```bash
+  kubectl version --short --client
+  ```
+
+  
 
 
 
@@ -60,7 +103,7 @@
 - 클러스터 및 작업자 노드 생성
 
 ```bash
-eksctl create cluster --name eks-sample --tags dev=test --region=ap-northeast-2 --nodegroup-name worker --node-private-networking --vpc-nat-mode Single --alb-ingress --node-type t3.medium --nodes 2
+eksctl create cluster --name eks-sample --tags Name=dev --region=ap-northeast-2 --nodegroup-name worker --node-private-networking --vpc-nat-mode Single --asg-access --alb-ingress-access --node-type t3.medium --nodes 2
 ```
 
 
@@ -71,6 +114,8 @@ eksctl create cluster --name eks-sample --tags dev=test --region=ap-northeast-2 
 eksctl get cluster
 eksctl get nodegroup --cluster eks-sample
 ```
+
+
 
 
 
@@ -93,31 +138,23 @@ node server.js
 
 ### 설명: 2번 container directory의 경우 1번에서 작성한 코드를 그대로 컨테이너화하여 동작
 
-* docker가 제대로 동작하는지 확인
+* docker가 제대로 동작하는지 확인 (3000포트가 아닌 다른 포트로 테스트하려면 SG open 필요)
 
 ```bash
 docker build -t mono:test .
-docker run --name="demo-container" -p 8080:3000 mono:test
+docker run --name="demo-container" -p 3000:3000 mono:test
 ```
 
 (1번 동작화면과 동일한 화면이 보이면 됨)
 
-* GKE에 구축하기 위해 GCR(Google Container Repository)에 Push
+* EKS에 구축하기 위해 ECR(Elastic Container Repository)에 Push
 
 ```bash
 source imagepush.sh
 ```
 
-* manifest directory로 이동하여 내 환경(프로젝트 및 이미지 태그)에 맞게 변수 지정
-
-```bash
-sed -i '' "s/my_project/$my_project/g" deploy.yaml
-sed -i '' "s/TAG/$TAG/g" deploy.yaml
-```
-
-(deploy.yaml 파일에 들어가서 내 프로젝트와 이미지가 제대로 변경되었는지 확인 필요하며 현재 구조는 최초의 한번의 환경변수에 대해 치환을 해주는 구조이기에 다음에 수정하여 업데이트 하는 경우에는 수동으로 이미지 태그에 대한 입력이 필요함)
-
-* gke 클러스터에 배포
+* EKS 클러스터에 배포 (path: ~/manifest)
+* Image tag는 ECR에 push가 된 tag name으로 변경 
 
 ```bash
 kubectl create -f deploy.yaml
