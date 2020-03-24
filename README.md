@@ -165,7 +165,11 @@ kubectl create -f svc.yaml
 
 * 생성 확인
 
-`kubectl get pods,svc --selector=app=mono`
+```bash
+kubectl get pods,svc
+```
+
+
 
 * Load Balancer 주소 확인
 
@@ -214,7 +218,7 @@ kubectl edit deployment.apps/alb-ingress-controller -n kube-system
 
 - 위의 설정 값에서 `--ingress-class=alb`행 뒤에 클러스터에 대한 설정을 파라미터로 설정함
 
-
+![demo](./images/ingress-setting.png)
 
 * eks 클러스터에 배포
 
@@ -227,24 +231,18 @@ kubectl create -f ingress.yaml
 * 생성 확인
 
 ```bash
-kubectl get pods,deploy,svc,ingress --selector=app=msa
+kubectl get pods,deploy,svc,ingress
 ```
 
-(HTTP(S) Load Balancer의 경우 생성하고 배포하는데 수분이 소요됨)
+(Application Load Balancer의 경우 생성하고 배포하는데 수분이 소요됨)
 
-![msa](./images/msa-component.png)
-
-(정상적으로 진행이 된다면 HTTP 로드밸런서에 의해 동작함)
-
-* Load Balancer 주소 확인
+* Load Balancer 주소 확인 후 결과 확인
 
 ```bash
-LB=$(kubectl get ingress ingress-l7 -o json | jq -r ".status.loadBalancer.ingress[].ip")
+LB=$(kubectl get ingress api-alb -o json | jq -r ".status.loadBalancer.ingress[].hostname")
 echo $LB
 curl -i -L $LB
 ```
-
-![result](./images/msa-result.png)
 
 
 
@@ -261,7 +259,8 @@ kubectl delete -f ingress.yaml
 * 클러스터 삭제
 
 ```bash
-gcloud container clusters delete sample-cluster --zone asia-northeast3-a
+aws eks delete-cluster --name eks-sample --region ap-northeast-2
 ```
 
 (혹은 console에서 삭제)
+
