@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: monoports
+  name: monosvc
   labels:
     app: mono-service
 spec:
@@ -12,4 +12,4 @@ spec:
     protocol: TCP
     port: 80
     targetPort: 3000
-  type: NodePort
+  type: LoadBalancer

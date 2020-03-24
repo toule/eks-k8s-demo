@@ -167,18 +167,14 @@ kubectl create -f svc.yaml
 
 `kubectl get pods,svc --selector=app=mono`
 
-![mono](./images/mono-component.png)
-
 * Load Balancer 주소 확인
 
 ```bash
-LB=$(kubectl get svc monosvc -o json | jq -r ".status.loadBalancer.ingress[].ip")
-curl -i -L $LB
+LB=$(kubectl get svc monosvc -o json | jq -r ".status.loadBalancer.ingress[].hostname")
+curl -i -L $LB 
 ```
 
-![result](./images/mono-result.png)  
-
-* (4번 진행을 위해) Object 삭제
+* (다음 진행을 위해) Object 삭제
 
 ```bash
 kubectl delete -f deploy.yaml
@@ -189,21 +185,38 @@ kebectl delete -f svc.yaml
 
 ### 설명: api 단위로 나누어서 배포 진행 (3번 directory로 들어가면 서비스별로 나눈 것을 확인할 수 있음)
 
-* 이미지 생성 후 GCR에 Push
+* 이미지 생성 후 ECR에 Push
 
 ```bash
 source push.sh
 ```
 
-* manifest directory로 이동하여 내 환경(프로젝트 및 이미지 태그)에 맞게 변수 지정
+* manifest folder에서 ECR에 push된 이미지 tag name을 확인하고 deploy.yaml파일의 컨테이너 이미지 태그를 수정
+
+- 현 예제는 하나의 ALB를 활용하여 구성할 것이며 사전 준비는 다음 문서를 [참조](https://docs.aws.amazon.com/ko_kr/eks/latest/userguide/alb-ingress.html)함
+- ALB 수신 클러스터에 대한 클러스터 Role Binding 구성
 
 ```bash
-source env.sh
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/rbac-role.yaml
 ```
 
-(deploy.yaml 파일에 들어가서 내 프로젝트와 이미지가 제대로 변경되었는지 확인 필요)
+- ALB 수신 컨트롤러 배포
 
-* gke 클러스터에 배포
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-alb-ingress-controller/v1.1.4/docs/examples/alb-ingress-controller.yaml
+```
+
+- ALB 수신 컨트롤러를 현재 클러스터 환경으로 셋팅
+
+```bash
+kubectl edit deployment.apps/alb-ingress-controller -n kube-system
+```
+
+- 위의 설정 값에서 `--ingress-class=alb`행 뒤에 클러스터에 대한 설정을 파라미터로 설정함
+
+
+
+* eks 클러스터에 배포
 
 ```bash
 kubectl create -f deploy.yaml

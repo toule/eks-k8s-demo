@@ -16,7 +16,7 @@ spec:
         app: msa-web
     spec:
       containers:
-      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/web:1575216757
+      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/web:1585079078
         name: web
         ports:
         - containerPort: 3000
@@ -29,8 +29,8 @@ spec:
           limits:
             cpu: "20m"
             memory: "20Mi"
-      nodeSelector:
-        eks.amazonaws.com/nodegroup: service
+#      nodeSelector:
+#        eks.amazonaws.com/nodegroup: service
 
 ---
 apiVersion: apps/v1
@@ -51,7 +51,7 @@ spec:
         app: msa-api
     spec:
       containers:
-      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/api:1575219500
+      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/api:1585078779
         name: api
         ports:
         - containerPort: 3000
@@ -64,8 +64,8 @@ spec:
           limits:
             cpu: "20m"
             memory: "20Mi"
-      nodeSelector:
-        eks.amazonaws.com/nodegroup: service
+#      nodeSelector:
+#        eks.amazonaws.com/nodegroup: service
 ---
 
 apiVersion: apps/v1
@@ -86,7 +86,7 @@ spec:
         app: msa-post
     spec:
       containers:
-      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/post:1575219506
+      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/post:1585078819
         name: posts
         ports:
         - containerPort: 3000
@@ -99,8 +99,8 @@ spec:
           limits:
             cpu: "20m"
             memory: "20Mi"
-      nodeSelector:
-        eks.amazonaws.com/nodegroup: service
+#      nodeSelector:
+#        eks.amazonaws.com/nodegroup: service
 
 ---
 apiVersion: apps/v1
@@ -121,7 +121,7 @@ spec:
         app: msa-thread
     spec:
       containers:
-      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/thread:1575219512
+      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/thread:1585078860
         name: threads
         ports:
         - containerPort: 3000
@@ -134,8 +134,8 @@ spec:
           limits:
             cpu: "20m"
             memory: "20Mi"
-      nodeSelector:
-        eks.amazonaws.com/nodegroup: service
+#      nodeSelector:
+#        eks.amazonaws.com/nodegroup: service
 
 ---
 apiVersion: apps/v1
@@ -156,7 +156,7 @@ spec:
         app: msa-user
     spec:
       containers:
-      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/users:1575215205
+      - image: 264594923212.dkr.ecr.ap-northeast-2.amazonaws.com/users:1585078903
         name: users
         ports:
         - containerPort: 3000
@@ -169,5 +169,5 @@ spec:
           limits:
             cpu: "20m"
             memory: "20Mi"
-      nodeSelector:
-        eks.amazonaws.com/nodegroup: service
+#      nodeSelector:
+#        eks.amazonaws.com/nodegroup: service
